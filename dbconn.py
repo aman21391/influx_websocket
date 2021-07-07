@@ -1,7 +1,9 @@
 from influxdb import InfluxDBClient
 import settings as s
 import datetime
+import logging
 
+logger = logging.getLogger('influx_data')
 class Influ:
     def __init__(self,username,password,database):
         self.database = database
@@ -12,8 +14,9 @@ class Influ:
         self.port = s.port
         try:
             self.conn = InfluxDBClient(self.host, self.port, self.username, self.password, self.database)
-            print(self.conn,'pppppppppppppppppppppp')
+            logger.info("DB connection is successful")
         except Exception as E:
+            logger.error("DB connection failed")
             print(E)
         return self.conn
 
@@ -26,7 +29,7 @@ def on_message(message,conn):
     try:
         message = message.replace('false','0').replace('true','1')
         message = eval(message)
-        print(message)
+        logger.info(message)
     except Exception as E:
         print(E)
     if(str(message["k"]["x"])=='1'):
@@ -47,8 +50,10 @@ def on_message(message,conn):
             }}]
         try:
             conn.write_points(son_body)
+            logger.info("data written on influx db")
         except Exception as E:
             print(E)
+            logger.info("data written on influx db")
 
 
 
